@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MacOS Web UI</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: url("https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1600&q=80") no-repeat center center fixed;
+    background-size: cover;
+    overflow: hidden;
+    transform-origin: center center;
+  }
+
+  /* Menu Bar */
+  #menuBar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 28px;
+    background: rgba(20, 20, 20, 0.55);
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    justify-content: space-between;
+    font-size: 13px;
+    backdrop-filter: blur(12px);
+    z-index: 9999;
+  }
+
+  #menuLeft span {
+    margin-right: 14px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  #menuRight {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Dock */
+  #dock {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(40, 40, 40, 0.45);
+    border-radius: 18px;
+    padding: 8px 14px;
+    display: flex;
+    gap: 12px;
+    backdrop-filter: blur(15px);
+    z-index: 9999;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .dock-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+  }
+
+  .dock-icon:hover {
+    transform: scale(1.25);
+  }
+
+  /* Window */
+  .window {
+    position: absolute;
+    width: 420px;
+    height: 320px;
+    background: rgba(245, 245, 245, 0.92);
+    border-radius: 14px;
+    box-shadow: 0px 18px 40px rgba(0,0,0,0.35);
+    overflow: hidden;
+    display: none;
+    z-index: 200;
+    backdrop-filter: blur(10px);
+  }
+
+  .window-header {
+    height: 34px;
+    background: rgba(230,230,230,0.9);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    cursor: grab;
+    user-select: none;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .traffic {
+    display: flex;
+    gap: 7px;
+    margin-right: 10px;
+  }
+
+  .btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .red { background: #ff5f57; }
+  .yellow { background: #febc2e; }
+  .green { background: #28c840; }
+
+  .window-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .window-body {
+    padding: 12px;
+    height: calc(100% - 34px);
+    overflow: auto;
+    font-size: 14px;
+  }
+
+  /* Launchpad */
+  #launchpad {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,10,0.6);
+    backdrop-filter: blur(18px);
+    display: none;
+    z-index: 9998;
+    padding-top: 80px;
+  }
+
+  #launchGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    max-width: 900px;
+    margin: auto;
+    gap: 28px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .launch-app {
+    width: 90px;
+    height: 90px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin: auto;
+  }
+
+  .launch-app:hover {
+    transform: scale(1.12);
+    background: rgba(255,255,255,0.35);
+  }
+
+  .launch-label {
+    margin-top: 8px;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* Zoom panel */
+  #zoomPanel {
+    position: fixed;
+    top: 40px;
+    right: 20px;
+    width: 180px;
+    background: rgba(30,30,30,0.7);
+    color: white;
+    border-radius: 14px;
+    padding: 12px;
+    backdrop-filter: blur(15px);
+    z-index: 9999;
+    font-size: 13px;
+  }
+
+  #zoomPanel input {
+    width: 100%;
+  }
+
+  /* Notes styling */
+  textarea {
+    width: 100%;
+    height: 200px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    background: rgba(255,255,255,0.85);
+  }
+
+  /* Calculator */
+  .calc-screen {
+    width: 100%;
+    height: 50px;
+    font-size: 20px;
+    text-align: right;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    background: white;
+  }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .calc-btn {
+    padding: 12px;
+    background: #eee;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    user-select: none;
+  }
+
+  .calc-btn:hover {
+    background: #ddd;
+  }
+
+  /* Browser */
+  .browser-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .browser-bar input {
+    flex: 1;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
+
+  .browser-bar button {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #007aff;
+    color: white;
+    font-weight: 600;
+  }
+
+  iframe {
+    width: 100%;
+    height: 210px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.2);
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Menu Bar -->
+<div id="menuBar">
+  <div id="menuLeft">
+    <span onclick="toggleLaunchpad()"></span>
+    <span>Finder</span>
+    <span>File</span>
+    <span>Edit</span>
+    <span>View</span>
+    <span>Go</span>
+    <span>Window</span>
+    <span>Help</span>
+  </div>
+
+  <div id="menuRight">
+    <span>🔍</span>
+    <span>📶</span>
+    <span>🔋</span>
+    <span id="clock"></span>
+  </div>
+</div>
+
+<!-- Zoom Panel -->
+<div id="zoomPanel">
+  <div style="font-weight:700; margin-bottom:6px;">Magnification</div>
+  <input type="range" min="0.6" max="2" step="0.05" value="1" id="zoomSlider">
+  <div style="margin-top:6px;">Zoom: <span id="zoomValue">100%</span></div>
+</div>
+
+<!-- Launchpad -->
+<div id="launchpad" onclick="closeLaunchpad(event)">
+  <div id="launchGrid">
+
+    <div onclick="openApp('finderWindow')">
+      <div class="launch-app">🗂️</div>
+      <div class="launch-label">Finder</div>
+    </div>
+
+    <div onclick="openApp('notesWindow')">
+      <div class="launch-app">📝</div>
+      <div class="launch-label">Notes</div>
+    </div>
+
+    <div onclick="openApp('calcWindow')">
+      <div class="launch-app">🧮</div>
+      <div class="launch-label">Calculator</div>
+    </div>
+
+    <div onclick="openApp('browserWindow')">
+      <div class="launch-app">🌐</div>
+      <div class="launch-label">Safari</div>
+    </div>
+
+    <div onclick="openApp('settingsWindow')">
+      <div class="launch-app">⚙️</div>
+      <div class="launch-label">Settings</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Dock -->
+<div id="dock">
+  <div class="dock-icon" onclick="openApp('finderWindow')">🗂️</div>
+  <div class="dock-icon" onclick="openApp('notesWindow')">📝</div>
+  <div class="dock-icon" onclick="openApp('calcWindow')">🧮</div>
+  <div class="dock-icon" onclick="openApp('browserWindow')">🌐</div>
+  <div class="dock-icon" onclick="toggleLaunchpad()">🚀</div>
+  <div class="dock-icon" onclick="openApp('settingsWindow')">⚙️</div>
+</div>
+
+<!-- Finder Window -->
+<div class="window" id="finderWindow" style="top: 80px; left: 60px;">
+  <div class="window-header" onmousedown="dragWindow(event, 'finderWindow')">
+    <div class="traffic">
+      <div class="btn red" onclick="closeWindow('finderWindow')"></div>
+      <div class="btn yellow" onclick="minimizeWindow('finderWindow')"></div>
+      <div class="btn green" onclick="maximizeWindow('finderWindow')"></div>
+    </div>
+    <div class="window-title">Finder</div>
+  </div>
+  <div class="window-body">
+    <b>Welcome to Finder</b>
+    <p>This is a fake file explorer, but it works like a Mac window.</p>
+    <ul>
+      <li>📄 Documents</li>
+      <li>📸 Pictures</li>
+      <li>🎵 Music</li>
+      <li>⬇️ Downloads</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Notes Window -->
+<div class="window" id="notesWindow" style="top: 120px; left: 140px;">
+  <div class="window-header" onmousedown="dragWindow(event, 'notesWindow')">
+    <div class="traffic">
+      <div class="btn red" onclick="closeWindow('notesWindow')"></div>
+      <div class="btn yellow" onclick="minimizeWindow('notesWindow')"></div>
+      <div class="btn green" onclick="maximizeWindow('notesWindow')"></div>
+    </div>
+    <div class="window-title">Notes</div>
+  </div>
+  <div class="window-body">
+    <textarea placeholder="Write your notes here..."></textarea>
+  </div>
+</div>
+
+<!-- Calculator Window -->
+<div class="window" id="calcWindow" style="top: 160px; left: 240px;">
+  <div class="window-header" onmousedown="dragWindow(event, 'calcWindow')">
+    <div class="traffic">
+      <div class="btn red" onclick="closeWindow('calcWindow')"></div>
+      <div class="btn yellow" onclick="minimizeWindow('calcWindow')"></div>
+      <div class="btn green" onclick="maximizeWindow('calcWindow')"></div>
+    </div>
+    <div class="window-title">Calculator</div>
+  </div>
+  <div class="window-body">
+    <input class="calc-screen" id="calcScreen" readonly />
+    <div class="calc-grid">
+      <div class="calc-btn" onclick="calcPress('7')">7</div>
+      <div class="calc-btn" onclick="calcPress('8')">8</div>
+      <div class="calc-btn" onclick="calcPress('9')">9</div>
+      <div class="calc-btn" onclick="calcPress('/')">÷</div>
+
+      <div class="calc-btn" onclick="calcPress('4')">4</div>
+      <div class="calc-btn" onclick="calcPress('5')">5</div>
+      <div class="calc-btn" onclick="calcPress('6')">6</div>
+      <div class="calc-btn" onclick="calcPress('*')">×</div>
+
+      <div class="calc-btn" onclick="calcPress('1')">1</div>
+      <div class="calc-btn" onclick="calcPress('2')">2</div>
+      <div class="calc-btn" onclick="calcPress('3')">3</div>
+      <div class="calc-btn" onclick="calcPress('-')">−</div>
+
+      <div class="calc-btn" onclick="calcPress('0')">0</div>
+      <div class="calc-btn" onclick="calcPress('.')">.</div>
+      <div class="calc-btn" onclick="calcResult()">=</div>
+      <div class="calc-btn" onclick="calcPress('+')">+</div>
+
+      <div class="calc-btn" onclick="calcClear()" style="grid-column: span 4; background:#ff5f57; color:white;">
+        Clear
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Browser Window -->
+<div class="window" id="browserWindow" style="top: 90px; left: 420px; width: 520px;">
+  <div class="window-header" onmousedown="dragWindow(event, 'browserWindow')">
+    <div class="traffic">
+      <div class="btn red" onclick="closeWindow('browserWindow')"></div>
+      <div class="btn yellow" onclick="minimizeWindow('browserWindow')"></div>
+      <div class="btn green" onclick="maximizeWindow('browserWindow')"></div>
+    </div>
+    <div class="window-title">Safari</div>
+  </div>
+  <div class="window-body">
+    <div class="browser-bar">
+      <input id="browserURL" placeholder="Enter URL (example: https://example.com)" />
+      <button onclick="loadURL()">Go</button>
+    </div>
+    <iframe id="browserFrame" src="https://example.com"></iframe>
+    <p style="font-size:12px; color:#444;">
+      ⚠ Some websites block iframe loading (normal browser security).
+    </p>
+  </div>
+</div>
+
+<!-- Settings Window -->
+<div class="window" id="settingsWindow" style="top: 150px; left: 520px;">
+  <div class="window-header" onmousedown="dragWindow(event, 'settingsWindow')">
+    <div class="traffic">
+      <div class="btn red" onclick="closeWindow('settingsWindow')"></div>
+      <div class="btn yellow" onclick="minimizeWindow('settingsWindow')"></div>
+      <div class="btn green" onclick="maximizeWindow('settingsWindow')"></div>
+    </div>
+    <div class="window-title">System Settings</div>
+  </div>
+  <div class="window-body">
+    <h3>Accessibility</h3>
+    <p><b>Magnification / Zoom</b> is active via the slider on the top-right.</p>
+    <p>Move it to zoom in/out the entire desktop.</p>
+
+    <hr>
+
+    <h3>Appearance</h3>
+    <button onclick="toggleWallpaper()">Toggle Wallpaper</button>
+
+    <hr>
+    <p style="font-size:12px; color:#444;">
+      This is a simulated MacOS UI in pure HTML/CSS/JS.
+    </p>
+  </div>
+</div>
+
+<script>
+  let topZ = 300;
+
+  function openApp(id) {
+    let win = document.getElementById(id);
+    win.style.display = "block";
+    bringToFront(win);
+    document.getElementById("launchpad").style.display = "none";
+  }
+
+  function closeWindow(id) {
+    document.getElementById(id).style.display = "none";
+  }
+
+  function minimizeWindow(id) {
+    document.getElementById(id).style.display = "none";
+  }
+
+  function maximizeWindow(id) {
+    let win = document.getElementById(id);
+    if (win.dataset.maximized === "true") {
+      win.style.width = win.dataset.oldWidth;
+      win.style.height = win.dataset.oldHeight;
+      win.style.top = win.dataset.oldTop;
+      win.style.left = win.dataset.oldLeft;
+      win.dataset.maximized = "false";
+    } else {
+      win.dataset.oldWidth = win.style.width || win.offsetWidth + "px";
+      win.dataset.oldHeight = win.style.height || win.offsetHeight + "px";
+      win.dataset.oldTop = win.style.top;
+      win.dataset.oldLeft = win.style.left;
+
+      win.style.top = "30px";
+      win.style.left = "10px";
+      win.style.width = "calc(100% - 20px)";
+      win.style.height = "calc(100% - 110px)";
+      win.dataset.maximized = "true";
+    }
+  }
+
+  function bringToFront(win) {
+    topZ++;
+    win.style.zIndex = topZ;
+  }
+
+  function dragWindow(event, id) {
+    let win = document.getElementById(id);
+    bringToFront(win);
+
+    let offsetX = event.clientX - win.offsetLeft;
+    let offsetY = event.clientY - win.offsetTop;
+
+    function move(e) {
+      win.style.left = (e.clientX - offsetX) + "px";
+      win.style.top = (e.clientY - offsetY) + "px";
+    }
+
+    function stop() {
+      document.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseup", stop);
+    }
+
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", stop);
+  }
+
+  function toggleLaunchpad() {
+    let lp = document.getElementById("launchpad");
+    lp.style.display = (lp.style.display === "block") ? "none" : "block";
+  }
+
+  function closeLaunchpad(event) {
+    if (event.target.id === "launchpad") {
+      document.getElementById("launchpad").style.display = "none";
+    }
+  }
+
+  // Clock
+  function updateClock() {
+    let now = new Date();
+    let h = now.getHours();
+    let m = now.getMinutes();
+    let ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12;
+    h = h ? h : 12;
+    m = m < 10 ? "0" + m : m;
+
+    document.getElementById("clock").innerText =
+      now.toDateString().slice(0, 3) + " " + h + ":" + m + " " + ampm;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Calculator
+  let calcInput = "";
+  function calcPress(val) {
+    calcInput += val;
+    document.getElementById("calcScreen").value = calcInput;
+  }
+
+  function calcClear() {
+    calcInput = "";
+    document.getElementById("calcScreen").value = "";
+  }
+
+  function calcResult() {
+    try {
+      calcInput = eval(calcInput).toString();
+      document.getElementById("calcScreen").value = calcInput;
+    } catch {
+      document.getElementById("calcScreen").value = "Error";
+      calcInput = "";
+    }
+  }
+
+  // Browser
+  function loadURL() {
+    let url = document.getElementById("browserURL").value.trim();
+    if (!url.startsWith("http")) url = "https://" + url;
+    document.getElementById("browserFrame").src = url;
+  }
+
+  // Magnification
+  const zoomSlider = document.getElementById("zoomSlider");
+  zoomSlider.addEventListener("input", () => {
+    let zoom = zoomSlider.value;
+    document.body.style.transform = "scale(" + zoom + ")";
+    document.getElementById("zoomValue").innerText = Math.round(zoom * 100) + "%";
+  });
+
+  // Wallpaper toggle
+  let wallpaperAlt = false;
+  function toggleWallpaper() {
+    wallpaperAlt = !wallpaperAlt;
+    if (wallpaperAlt) {
+      document.body.style.backgroundImage =
+        "url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80')";
+    } else {
+      document.body.style.backgroundImage =
+        "url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1600&q=80')";
+    }
+  }
+
+  // Click window to bring to front
+  document.querySelectorAll(".window").forEach(win => {
+    win.addEventListener("mousedown", () => bringToFront(win));
+  });
+
+</script>
+
+</body>
+</html>
