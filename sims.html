@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Portal</title>
+  <title>User Portal | Fishix Simulators</title>
 
   <style>
     body {
@@ -21,7 +21,7 @@
       background: #1e1e1e;
       padding: 30px;
       border-radius: 12px;
-      width: 320px;
+      width: 340px;
       text-align: center;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
@@ -51,7 +51,7 @@
       background: #005fd1;
     }
 
-    #content {
+    #adminContent, #friendContent {
       display: none;
       text-align: left;
       width: 80%;
@@ -69,47 +69,92 @@
 </head>
 <body>
 
+  <!-- LOGIN BOX -->
   <div class="box" id="loginBox">
-    <h2>Welc0m3 t0 th3 adm1n p0rta1</h2>
+    <h2>Login Portal</h2>
+
+    <input type="text" id="usernameInput" placeholder="Username..." />
     <input type="password" id="passwordInput" placeholder="Password..." />
-    <button onclick="checkPassword()">Unlock</button>
+
+    <button onclick="login()">Login</button>
     <p id="errorMsg" style="color:red; margin-top:10px;"></p>
   </div>
 
-  <div id="content">
-    <h1>W3lc0me t0 th3 adm1n p0rtal</h1>
-    <p>Y0u n0w hav3 acc3ss t0 adm1n d1r3ct0rys</p>
 
-    <h3>Links</h3>
+  <!-- ADMIN SECTION -->
+  <div id="adminContent">
+    <h1>Admin Section</h1>
+    <p>Welcome, Kaiju</p>
+
+    <h3>Admin Links</h3>
     <ul>
       <li><a href="index.html" target="_blank">Go Home</a></li>
-      <li><a href="sims/Windows 8 Interactive Demo.html" target="_blank">Win 8 Demo</a></li>
       <li><a href="sims/Ragdoll Archers.html" target="_blank">Ragdoll Archers</a></li>
       <li><a href="sims/Minecraft 1.12.2.html" target="_blank">Minecraft</a></li>
     </ul>
 
-    <p>COngrats 0n g3tting th3 passw0rd!</p>
+    <button onclick="logout()">Logout</button>
   </div>
 
-  <script>
-    const correctPassword = "BluG64L"; // <-- CHANGE THIS PASSWORD
 
-    function checkPassword() {
-      const input = document.getElementById("passwordInput").value;
+  <!-- FRIEND SECTION -->
+  <div id="friendContent">
+    <h1>Other Users</h1>
+    <p>Welcome, Other Users</p>
+
+    <h3>Other user | Links</h3>
+    <ul>
+      <li><a href="index.html" target="_blank">Go Home</a></li>
+      <li><a href="sims/Minecraft 1.12.2.html" target="_blank">Minecraft</a></li>
+       <li><a href="sims/Ragdoll Archers.html" target="_blank">Ragdoll Archers</a></li>
+    </ul>
+
+    <button onclick="logout()">Logout</button>
+  </div>
+
+
+  <script>
+    // USERS LIST (add more users here)
+    const users = [
+      { username: "kaiju", password: "BluG64L", role: "admin" },
+      { username: "kayden", password: "example", role: "friend" }
+    ];
+
+    function login() {
+      const username = document.getElementById("usernameInput").value;
+      const password = document.getElementById("passwordInput").value;
       const errorMsg = document.getElementById("errorMsg");
 
-      if (input === correctPassword) {
+      const foundUser = users.find(user => user.username === username && user.password === password);
+
+      if (foundUser) {
         document.getElementById("loginBox").style.display = "none";
-        document.getElementById("content").style.display = "block";
+
+        if (foundUser.role === "admin") {
+          document.getElementById("adminContent").style.display = "block";
+        } else if (foundUser.role === "friend") {
+          document.getElementById("friendContent").style.display = "block";
+        }
+
       } else {
-        errorMsg.textContent = "Incorrect password. Try again.";
+        errorMsg.textContent = "Incorrect username or password.";
       }
     }
 
+    function logout() {
+      document.getElementById("adminContent").style.display = "none";
+      document.getElementById("friendContent").style.display = "none";
+      document.getElementById("loginBox").style.display = "block";
+
+      document.getElementById("usernameInput").value = "";
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("errorMsg").textContent = "";
+    }
+
     // Allow Enter key to submit
-    document.getElementById("passwordInput").addEventListener("keypress", function(event) {
+    document.addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
-        checkPassword();
+        login();
       }
     });
   </script>
