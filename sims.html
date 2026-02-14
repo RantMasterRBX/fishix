@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>User Portal | Fishix Simulators</title>
+  <title>Windows</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #111;
+      background: #0008b8b;
       color: white;
       display: flex;
       justify-content: center;
@@ -71,12 +71,12 @@
 
   <!-- LOGIN BOX -->
   <div class="box" id="loginBox">
-    <h2>Login Portal</h2>
+    <h2>L0g1n P0rt4l</h2>
 
     <input type="text" id="usernameInput" placeholder="Username..." />
     <input type="password" id="passwordInput" placeholder="Password..." />
 
-    <button onclick="login()">Login</button>
+    <button onclick="login()">L0g1n</button>
     <p id="errorMsg" style="color:red; margin-top:10px;"></p>
   </div>
 
@@ -91,6 +91,14 @@
       <li><a href="index.html" target="_blank">Go Home</a></li>
       <li><a href="sims/Ragdoll Archers.html" target="_blank">Ragdoll Archers</a></li>
       <li><a href="sims/Minecraft 1.12.2.html" target="_blank">Minecraft</a></li>
+            <li><a href="sims/Ragdoll Hit.html" target="_blank">Ragdoll Hit</a></li>  
+            <li><a href="sims/Blocky Snakes.html" target="_blank">Blocky Snakes</a></li>
+            <li><a href="sims/Kaji Run.html" target="_blank">Kaiju Run</a></li>
+            <li><a href="sims/Google Feud.html" target="_blank">Google Feudt</a></li>
+            <li><a href="sims/Jelly Mario.html" target="_blank">Jelly Mario</a></li>
+            <li><a href="sims/Godzilla Daikaiju Battle Royale.html" target="_blank">Godzilla Daikaiju Battle Royale</a></li>
+            <li><a href="sims/Learn To Fly.html" target="_blank">Learn To Fly</a></li>
+            <li><a href="sims/Spacebar Clicker.html" target="_blank">Spacebar Clicker</a></li>
     </ul>
 
     <button onclick="logout()">Logout</button>
@@ -116,8 +124,9 @@
   <script>
     // USERS LIST (add more users here)
     const users = [
-      { username: "kaiju", password: "BluG64L", role: "admin" },
-      { username: "kayden", password: "example", role: "friend" }
+      { username: "kaiju", password: "Frank The Snake", role: "admin" },
+      { username: "The Game Of Life", password: "MONOPOLY Fortnite", role: "admin" },
+      { username: "kayden", password: "Yuji", role: "friend" }
     ];
 
     function login() {
@@ -137,7 +146,7 @@
         }
 
       } else {
-        errorMsg.textContent = "Incorrect username or password.";
+        errorMsg.textContent = "Please fill out the form and wait for the username and password to come to you!";
       }
     }
 
