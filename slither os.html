@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Slither OS by Fishix</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  overflow:hidden;
+  background-size:cover;
+  background-position:center;
+  background-image:linear-gradient(45deg,#1e3c72,#2a5298);
+}
+
+/* LOGIN SCREEN */
+#loginScreen{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:#111;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:9999;
+}
+input{padding:8px;margin:5px;}
+button{padding:8px;margin:5px;cursor:pointer;}
+
+/* DESKTOP */
+#desktop{display:none;}
+
+#taskbar{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  height:40px;
+  background:#111;
+  color:white;
+  display:flex;
+  align-items:center;
+}
+#startBtn{padding:10px;background:#222;cursor:pointer;}
+#logoutBtn{margin-left:auto;padding:10px;background:#400;cursor:pointer;}
+
+#startMenu{
+  position:fixed;
+  bottom:40px;
+  left:0;
+  width:250px;
+  background:#222;
+  color:white;
+  display:none;
+  padding:10px;
+  max-height:400px;
+  overflow:auto;
+}
+.app{padding:5px;cursor:pointer;}
+.app:hover{background:#444;}
+
+.window{
+  position:absolute;
+  top:100px;
+  left:100px;
+  width:500px;
+  height:350px;
+  background:white;
+  border:2px solid black;
+  display:none;
+  flex-direction:column;
+}
+.titlebar{background:#333;color:white;padding:5px;cursor:move;}
+.content{flex:1;overflow:auto;}
+iframe{width:100%;height:100%;border:none;}
+
+.widget{
+  position:fixed;
+  right:10px;
+  background:#0009;
+  color:white;
+  padding:10px;
+}
+#clockWidget{top:10px;}
+#monitorWidget{top:80px;}
+#slideWidget{top:160px;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <h2>Welcome to Slither OS by Fishix devs</h2>
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <button onclick="createAccount()">Create Account</button>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+
+  <div id="taskbar">
+    <div id="startBtn">Start</div>
+    <div id="logoutBtn" onclick="logout()">Logout</div>
+  </div>
+
+  <div id="startMenu"></div>
+
+  <!-- WINDOWS -->
+
+  <div id="browser" class="window">
+    <div class="titlebar">Web Browser</div>
+    <div class="content">
+      <button onclick="loadPage('https://example.com')">Example</button>
+      <button onclick="loadPage('https://wikipedia.org')">Wikipedia</button>
+      <button onclick="loadPage('https://bing.com')">Bing</button>
+      <iframe id="browserFrame"></iframe>
+    </div>
+  </div>
+
+  <div id="chrome" class="window">
+    <div class="titlebar">Google Chrome</div>
+    <div class="content">
+      <iframe src="https://www.google.com"></iframe>
+    </div>
+  </div>
+
+  <div id="maps" class="window">
+    <div class="titlebar">Maps</div>
+    <div class="content">
+      <select onchange="document.getElementById('mapFrame').src=this.value">
+        <option value="https://www.google.com/maps">Google Maps</option>
+        <option value="https://www.bing.com/maps">Bing Maps</option>
+        <option value="https://www.openstreetmap.org">OpenStreetMap</option>
+      </select>
+      <iframe id="mapFrame"></iframe>
+    </div>
+  </div>
+
+  <div id="store" class="window">
+    <div class="titlebar">App Store</div>
+    <div class="content">
+      <button onclick="window.open('https://minesweeperonline.com','_blank')">Minesweeper</button><br>
+      <button onclick="window.open('https://earth.google.com','_blank')">Google Earth</button><br>
+      <button onclick="window.open('https://discord.com/app','_blank')">Discord</button><br>
+      <button onclick="alert('https://kaijuno8.neocities.com/tron.html')">Tron</button><br>
+      <button onclick="alert('Fake Android Emulator Started')">Android Emulator</button>
+    </div>
+  </div>
+
+  <div id="settings" class="window">
+    <div class="titlebar">Wallpaper Settings</div>
+    <div class="content">
+      <input type="file" onchange="setWallpaper(event)">
+    </div>
+  </div>
+
+  <!-- WIDGETS -->
+  <div id="clockWidget" class="widget"></div>
+  <div id="monitorWidget" class="widget"></div>
+  <div id="slideWidget" class="widget">
+    <img id="slideImg" width="120">
+  </div>
+
+</div>
+
+<script>
+/* APPS */
+const apps=[
+ {name:"Browser",id:"browser"},
+ {name:"Google Chrome",id:"chrome"},
+ {name:"Maps",id:"maps"},
+ {name:"Store",id:"store"},
+ {name:"Wallpaper Settings",id:"settings"}
+];
+
+const startMenu=document.getElementById("startMenu");
+apps.forEach(app=>{
+ let div=document.createElement("div");
+ div.className="app";
+ div.innerText=app.name;
+ div.onclick=()=>openApp(app.id);
+ startMenu.appendChild(div);
+});
+
+document.getElementById("startBtn").onclick=()=>{
+ startMenu.style.display=
+ startMenu.style.display=="block"?"none":"block";
+};
+
+function openApp(id){
+ document.getElementById(id).style.display="flex";
+ startMenu.style.display="none";
+}
+
+/* LOGIN SYSTEM */
+function createAccount(){
+ let user=username.value;
+ let pass=password.value;
+ if(!user||!pass)return alert("Fill both fields");
+ localStorage.setItem("user_"+user,pass);
+ alert("Account Created!");
+}
+
+function login(){
+ let user=username.value;
+ let pass=password.value;
+ if(localStorage.getItem("user_"+user)==pass){
+  localStorage.setItem("loggedIn",user);
+  loadDesktop(user);
+ }else alert("Wrong login");
+}
+
+function logout(){
+ localStorage.removeItem("loggedIn");
+ location.reload();
+}
+
+function loadDesktop(user){
+ loginScreen.style.display="none";
+ desktop.style.display="block";
+ let savedWall=localStorage.getItem("wallpaper_"+user);
+ if(savedWall)document.body.style.backgroundImage="url('"+savedWall+"')";
+}
+
+if(localStorage.getItem("loggedIn")){
+ loadDesktop(localStorage.getItem("loggedIn"));
+}
+
+/* WALLPAPER PER USER */
+function setWallpaper(e){
+ let file=e.target.files[0];
+ let reader=new FileReader();
+ reader.onload=function(){
+  let user=localStorage.getItem("loggedIn");
+  localStorage.setItem("wallpaper_"+user,reader.result);
+  document.body.style.backgroundImage="url('"+reader.result+"')";
+ };
+ reader.readAsDataURL(file);
+}
+
+/* WIDGETS */
+setInterval(()=>{
+ clockWidget.innerText="Time: "+new Date().toLocaleTimeString();
+},1000);
+
+setInterval(()=>{
+ let cpu=Math.floor(Math.random()*100);
+ let ram=Math.floor(Math.random()*100);
+ monitorWidget.innerText="CPU: "+cpu+"%\nRAM: "+ram+"%";
+},2000);
+
+let slides=[
+ "https://picsum.photos/200?1",
+ "https://picsum.photos/200?2",
+ "https://picsum.photos/200?3"
+];
+let i=0;
+setInterval(()=>{
+ slideImg.src=slides[i];
+ i=(i+1)%slides.length;
+},3000);
+
+/* DRAG WINDOWS */
+document.querySelectorAll(".window").forEach(win=>{
+ let isDown=false,offsetX,offsetY;
+ win.querySelector(".titlebar").onmousedown=e=>{
+  isDown=true;
+  offsetX=e.clientX-win.offsetLeft;
+  offsetY=e.clientY-win.offsetTop;
+ };
+ document.onmouseup=()=>isDown=false;
+ document.onmousemove=e=>{
+  if(isDown){
+   win.style.left=e.clientX-offsetX+"px";
+   win.style.top=e.clientY-offsetY+"px";
+  }
+ };
+});
+</script>
+
+</body>
+</html>
