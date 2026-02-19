@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Windows Ultimate Clone</title>
+<style>
+:root{
+  --accent:#0078d7;
+  --window:#ffffff;
+  --taskbar:#1f1f1f;
+}
+body{
+  margin:0;
+  font-family:Segoe UI;
+  background:#0c0c0c;
+  overflow:hidden;
+}
+#desktop{
+  position:absolute;
+  inset:0;
+  background:url('https://wallpapercave.com/wp/wp2757874.jpg') center/cover;
+}
+.icon{
+  width:90px;
+  margin:20px;
+  color:white;
+  cursor:pointer;
+}
+#taskbar{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:45px;
+  background:var(--taskbar);
+  display:flex;
+  align-items:center;
+  color:white;
+}
+#startbtn{width:60px;text-align:center;cursor:pointer;}
+#startmenu{
+  position:absolute;
+  bottom:45px;
+  left:0;
+  width:250px;
+  background:#202020;
+  color:white;
+  display:none;
+  padding:10px;
+}
+.start-item{padding:8px;cursor:pointer;}
+.start-item:hover{background:var(--accent);}
+.window{
+  position:absolute;
+  width:500px;
+  height:400px;
+  background:var(--window);
+  top:100px;
+  left:120px;
+  border-radius:6px;
+  display:none;
+  flex-direction:column;
+  box-shadow:0 0 15px rgba(0,0,0,0.6);
+  resize:both;
+  overflow:auto;
+}
+.titlebar{
+  background:var(--accent);
+  color:white;
+  padding:8px;
+  cursor:move;
+}
+.content{flex:1;padding:10px;overflow:auto;}
+button{padding:6px;margin:4px;}
+canvas{background:#222;}
+</style>
+</head>
+<body>
+
+<audio id="clickSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+<audio id="bootSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+<audio id="errorSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+
+<div id="desktop">
+
+<div class="icon" onclick="openApp('minesweeper')">💣 Minesweeper</div>
+<div class="icon" onclick="openApp('browser')">🌐 Browser</div>
+<div class="icon" onclick="openApp('upgrade')">🪟 Windows 11 Upgrade</div>
+
+<div id="taskbar">
+<div id="startbtn" onclick="toggleStart()">🪟</div>
+</div>
+
+<div id="startmenu">
+<div class="start-item" onclick="openApp('minesweeper')">Minesweeper</div>
+<div class="start-item" onclick="openApp('browser')">Browser</div>
+<div class="start-item" onclick="openApp('upgrade')">Windows 11 Upgrade</div>
+</div>
+
+</div>
+
+<!-- MINESWEEPER -->
+<div class="window" id="minesweeper">
+<div class="titlebar">Minesweeper</div>
+<div class="content"><div id="game"></div></div>
+</div>
+
+<!-- BROWSER -->
+<div class="window" id="browser">
+<div class="titlebar">Secure School Browser</div>
+<div class="content">
+<input id="url" placeholder="Enter URL (example.com)">
+<button onclick="browse()">Go</button>
+<iframe id="frame" width="100%" height="300"></iframe>
+</div>
+</div>
+
+<!-- UPGRADE -->
+<div class="window" id="upgrade">
+<div class="titlebar">Windows 11 Upgrade Assistant</div>
+<div class="content">
+<h3>Check Compatibility</h3>
+<button onclick="upgradeCheck()">Check Now</button>
+<div id="upgradeResult"></div>
+</div>
+</div>
+
+<script>
+bootSound.play();
+
+// START MENU
+function toggleStart(){
+startmenu.style.display=startmenu.style.display==="block"?"none":"block";
+}
+
+// OPEN APP
+function openApp(id){
+clickSound.play();
+let w=document.getElementById(id);
+w.style.display="flex";
+makeDraggable(w);
+}
+
+// DRAG WINDOWS
+function makeDraggable(el){
+let bar=el.querySelector(".titlebar");
+bar.onmousedown=function(e){
+let offsetX=e.clientX-el.offsetLeft;
+let offsetY=e.clientY-el.offsetTop;
+document.onmousemove=function(e){
+el.style.left=e.clientX-offsetX+"px";
+el.style.top=e.clientY-offsetY+"px";
+}
+document.onmouseup=function(){
+document.onmousemove=null;
+}
+}
+}
+
+// FULL MINESWEEPER
+let size=8;
+let mines=10;
+let grid=[];
+function initGame(){
+let game=document.getElementById("game");
+game.innerHTML="";
+grid=[];
+for(let y=0;y<size;y++){
+grid[y]=[];
+for(let x=0;x<size;x++){
+grid[y][x]={mine:false,revealed:false,flag:false};
+}
+}
+for(let i=0;i<mines;i++){
+let rx=Math.floor(Math.random()*size);
+let ry=Math.floor(Math.random()*size);
+grid[ry][rx].mine=true;
+}
+draw();
+}
+function draw(){
+let game=document.getElementById("game");
+game.innerHTML="";
+for(let y=0;y<size;y++){
+for(let x=0;x<size;x++){
+let btn=document.createElement("button");
+btn.style.width="30px";
+btn.style.height="30px";
+btn.oncontextmenu=(e)=>{e.preventDefault();grid[y][x].flag=!grid[y][x].flag;draw();}
+btn.onclick=()=>reveal(x,y);
+if(grid[y][x].revealed){
+btn.innerText=grid[y][x].mine?"💣":count(x,y)||"";
+}
+if(grid[y][x].flag)btn.innerText="🚩";
+game.appendChild(btn);
+}
+game.appendChild(document.createElement("br"));
+}
+}
+function count(x,y){
+let c=0;
+for(let dy=-1;dy<=1;dy++)
+for(let dx=-1;dx<=1;dx++){
+if(grid[y+dy]&&grid[y+dy][x+dx]&&grid[y+dy][x+dx].mine)c++;
+}
+return c;
+}
+function reveal(x,y){
+if(grid[y][x].revealed||grid[y][x].flag)return;
+grid[y][x].revealed=true;
+if(grid[y][x].mine){
+errorSound.play();
+alert("Game Over");
+initGame();
+return;
+}
+if(count(x,y)==0){
+for(let dy=-1;dy<=1;dy++)
+for(let dx=-1;dx<=1;dx++){
+if(grid[y+dy]&&grid[y+dy][x+dx])reveal(x+dx,y+dy);
+}
+}
+draw();
+}
+initGame();
+
+// SAFE BROWSER
+function browse(){
+let val=url.value.toLowerCase();
+if(val.includes("adult")||val.includes("proxy")||val.includes("vpn")){
+errorSound.play();
+alert("Blocked by School Filter");
+return;
+}
+frame.src="https://"+val;
+}
+
+// UPGRADE APP
+function upgradeCheck(){
+upgradeResult.innerHTML="Checking system...";
+setTimeout(()=>{
+upgradeResult.innerHTML="✔ Compatible! Ready for Windows 11.";
+},2000);
+}
+</script>
+
+</body>
+</html>
