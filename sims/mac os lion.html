@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mac OS X Lion</title>
+<style>
+body{
+margin:0;
+font-family:"Helvetica Neue",sans-serif;
+background:url('https://wallpapercave.com/wp/wp2757874.jpg');
+background-size:cover;
+overflow:hidden;
+transition:.3s;
+}
+.login{
+position:absolute;
+width:100%;
+height:100%;
+background:#111;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+color:white;
+}
+.window{
+position:absolute;
+width:600px;
+height:400px;
+background:#f0f0f0;
+border-radius:8px;
+box-shadow:0 10px 25px rgba(0,0,0,.6);
+display:none;
+z-index:5;
+}
+.titlebar{
+height:30px;
+background:linear-gradient(#ddd,#bbb);
+border-radius:8px 8px 0 0;
+cursor:move;
+display:flex;
+align-items:center;
+padding-left:10px;
+}
+.close{
+width:12px;height:12px;background:red;border-radius:50%;margin-right:8px;cursor:pointer;
+}
+.content{padding:10px;height:350px;overflow:auto;}
+.dock{
+position:absolute;
+bottom:0;width:100%;height:90px;
+display:flex;justify-content:center;align-items:flex-end;gap:20px;
+}
+.dock img{
+width:50px;transition:.2s;
+}
+.dock img:hover{transform:scale(1.6);}
+.dark{background:#111!important;color:white;}
+.icon{cursor:pointer;margin:5px;}
+</style>
+</head>
+<body>
+
+<div class="login" id="login">
+<h1>User</h1>
+<input type="password" id="pass" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="err"></p>
+</div>
+
+<div class="dock" id="dock"></div>
+
+<!-- Safari -->
+<div class="window" id="safari">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('safari')"></div>Safari
+</div>
+<div class="content">
+<input id="url" placeholder="https://example.com">
+<button onclick="go()">Go</button>
+<iframe id="browser" style="width:100%;height:300px;"></iframe>
+</div>
+</div>
+
+<!-- Finder -->
+<div class="window" id="finder">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('finder')"></div>Finder
+</div>
+<div class="content" id="files"></div>
+</div>
+
+<!-- Chess -->
+<div class="window" id="chess">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('chess')"></div>Chess
+</div>
+<div class="content"><canvas id="chessboard" width="320" height="320"></canvas></div>
+</div>
+
+<!-- Minesweeper -->
+<div class="window" id="mine">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('mine')"></div>Minesweeper
+</div>
+<div class="content"><div id="minefield"></div></div>
+</div>
+
+<!-- Tron -->
+<div class="window" id="tron">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('tron')"></div>Tron
+</div>
+<div class="content"><canvas id="tronCanvas" width="400" height="300"></canvas></div>
+</div>
+
+<!-- Settings -->
+<div class="window" id="settings">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('settings')"></div>Settings
+</div>
+<div class="content">
+<button onclick="toggleDark()">Toggle Dark Mode</button><br><br>
+<input type="file" onchange="uploadWall(event)">
+</div>
+</div>
+
+<!-- VMware -->
+<div class="window" id="vmware">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('vmware')"></div>VMware - Windows 8
+</div>
+<div class="content" style="background:#1e90ff;color:white;">
+<h2>Windows 8 Start Screen</h2>
+<div class="icon">Mail</div>
+<div class="icon">Internet Explorer</div>
+<div class="icon">Store</div>
+</div>
+</div>
+
+<!-- App Store -->
+<div class="window" id="store">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('store')"></div>App Store
+</div>
+<div class="content">
+<button onclick="install('mine')">Install Minesweeper</button><br>
+<button onclick="install('chess')">Install Chess</button><br>
+<button onclick="install('tron')">Install Tron</button><br>
+<button onclick="window.open('https://discord.com')">Discord</button><br>
+<button onclick="window.open('https://earth.google.com')">Google Earth</button>
+</div>
+</div>
+
+<!-- Upgrade -->
+<div class="window" id="upgrade">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('upgrade')"></div>Mac OS Upgrade
+</div>
+<div class="content"><h3>Your system does not meet the requirements.</h3></div>
+</div>
+
+<script>
+let apps=["safari","finder","settings","vmware","store","upgrade"];
+let installed=JSON.parse(localStorage.getItem("apps"))||apps;
+
+function login(){
+if(document.getElementById("pass").value=="1234"){
+document.getElementById("login").style.display="none";
+renderDock();
+}else document.getElementById("err").innerText="Wrong password";
+}
+
+function renderDock(){
+let dock=document.getElementById("dock");
+dock.innerHTML="";
+installed.forEach(app=>{
+let img=document.createElement("img");
+img.src="https://img.icons8.com/ios-filled/100/mac-os.png";
+img.onclick=()=>openApp(app);
+dock.appendChild(img);
+});
+}
+
+function install(app){
+if(!installed.includes(app)){
+installed.push(app);
+localStorage.setItem("apps",JSON.stringify(installed));
+renderDock();
+alert("Installed!");
+}
+}
+
+function openApp(id){
+document.getElementById(id).style.display="block";
+}
+
+function closeApp(id){
+document.getElementById(id).style.display="none";
+}
+
+function go(){
+document.getElementById("browser").src=document.getElementById("url").value;
+}
+
+function toggleDark(){
+document.body.classList.toggle("dark");
+}
+
+function uploadWall(e){
+let reader=new FileReader();
+reader.onload=function(){
+document.body.style.background="url('"+reader.result+"')";
+document.body.style.backgroundSize="cover";
+};
+reader.readAsDataURL(e.target.files[0]);
+}
+
+function drag(e,el){
+let shiftX=e.clientX-el.getBoundingClientRect().left;
+let shiftY=e.clientY-el.getBoundingClientRect().top;
+function moveAt(pageX,pageY){
+el.style.left=pageX-shiftX+'px';
+el.style.top=pageY-shiftY+'px';
+}
+function onMouseMove(e){moveAt(e.pageX,e.pageY);}
+document.addEventListener('mousemove',onMouseMove);
+document.addEventListener('mouseup',()=>document.removeEventListener('mousemove',onMouseMove),{once:true});
+}
+
+/* Chess Basic */
+let ctx=document.getElementById("chessboard").getContext("2d");
+for(let y=0;y<8;y++)
+for(let x=0;x<8;x++){
+ctx.fillStyle=(x+y)%2==0?"#fff":"#000";
+ctx.fillRect(x*40,y*40,40,40);
+}
+
+/* Minesweeper */
+let minefield=document.getElementById("minefield");
+for(let i=0;i<25;i++){
+let cell=document.createElement("button");
+cell.textContent="?";
+cell.onclick=()=>cell.textContent=Math.random()<.2?"💣":"";
+minefield.appendChild(cell);
+}
+
+/* Tron */
+let tc=document.getElementById("tronCanvas");
+let tctx=tc.getContext("2d");
+let x=10,y=10;
+document.addEventListener("keydown",e=>{
+if(e.key=="ArrowRight")x+=5;
+if(e.key=="ArrowLeft")x-=5;
+if(e.key=="ArrowUp")y-=5;
+if(e.key=="ArrowDown")y+=5;
+tctx.fillStyle="cyan";
+tctx.fillRect(x,y,5,5);
+});
+</script>
+
+</body>
+</html>
