@@ -105,6 +105,125 @@ body {
         <a href="index.html" target="_blank">Home</a></li>
         <a href="simulators.html" target="_blank">Simulators</li>
 <a href="sims.html" target="_blank">Admin Portal</a></li>
+            <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fishix Interactive Simulators</title>
+<link rel="icon" href="fishix.jpg" type="image/x-icon">    
+
+<style>
+body {
+    margin: 0;
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
+    background: linear-gradient(to bottom, #9ec9f5 0%, #5aa3e6 40%, #3d8edb 100%);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Top Glass Navigation Bar */
+.navbar {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(200,200,200,0.8));
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8),
+                0 2px 5px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 40px;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar li {
+    font-size: 15px;
+    color: #333;
+    cursor: pointer;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+}
+
+/* Main Content Card */
+.card {
+    margin-top: 80px;
+    width: 600px;
+    background: linear-gradient(to bottom, #ffffff, #e6e6e6);
+    border-radius: 15px;
+    box-shadow: 
+        inset 0 2px 5px rgba(255,255,255,0.8),
+        0 8px 20px rgba(0,0,0,0.4);
+    padding: 40px;
+    text-align: center;
+}
+
+.card h1 {
+    font-size: 32px;
+    color: #222;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.8);
+}
+
+.card p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* Glossy Aqua Button */
+.aqua-button {
+    padding: 12px 30px;
+    border-radius: 25px;
+    border: 1px solid #2a6db3;
+    background: linear-gradient(to bottom, #6ec3ff 0%, #3d8edb 50%, #2a6db3 100%);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 
+        inset 0 2px 5px rgba(255,255,255,0.6),
+        0 4px 8px rgba(0,0,0,0.4);
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.3);
+    transition: all 0.1s ease-in-out;
+}
+
+.aqua-button:hover {
+    background: linear-gradient(to bottom, #8ed5ff 0%, #4aa0f0 50%, #327ccc 100%);
+}
+
+.aqua-button:active {
+    transform: translateY(2px);
+    box-shadow: 
+        inset 0 2px 5px rgba(0,0,0,0.4);
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <ul>
+        <a href="index.html" target="_blank">Home</a></li>
+        <a href="simulators.html" target="_blank">Simulators</li>
+<a href="sims.html" target="_blank">Admin Portal</a></li>
+    <a href="meet the devs.html" target="_blank">Meet The Fishix Developers</a></li>
+    </ul>
+</div>
+
+<div class="card">
+    <h1>Welcome to Fishix (Pronounced like the work physics)</h1>
+    <p>A private page for interactive simulators and game.</p>
+    <button class="aqua-button">Get Started</button>
+</div>
+
+</body>
+</html>
     </ul>
 </div>
 
