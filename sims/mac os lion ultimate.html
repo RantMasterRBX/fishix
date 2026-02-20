@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mac OS X Lion - Ultra</title>
+<style>
+body{
+margin:0;
+font-family:"Helvetica Neue",sans-serif;
+background:url('https://wallpapercave.com/wp/wp2757874.jpg');
+background-size:cover;
+overflow:hidden;
+transition:.3s;
+}
+
+/* Boot */
+#boot{
+position:absolute;
+width:100%;
+height:100%;
+background:black;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:40px;
+z-index:9999;
+}
+
+/* Login */
+#login{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.7);
+display:none;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+color:white;
+}
+
+/* Windows */
+.window{
+position:absolute;
+width:600px;
+height:400px;
+background:#f0f0f0;
+border-radius:8px;
+box-shadow:0 10px 25px rgba(0,0,0,.6);
+display:none;
+transition:.2s;
+}
+.titlebar{
+height:30px;
+background:linear-gradient(#ddd,#bbb);
+border-radius:8px 8px 0 0;
+cursor:move;
+display:flex;
+align-items:center;
+padding-left:10px;
+}
+.close{
+width:12px;height:12px;background:red;border-radius:50%;margin-right:8px;cursor:pointer;
+}
+.min{
+width:12px;height:12px;background:orange;border-radius:50%;margin-right:8px;cursor:pointer;
+}
+.content{padding:10px;height:350px;overflow:auto;}
+.window:active{z-index:1000;}
+
+/* Dock */
+.dock{
+position:absolute;
+bottom:0;width:100%;height:90px;
+display:flex;justify-content:center;align-items:flex-end;gap:20px;
+}
+.dock img{
+width:50px;transition:.2s;
+cursor:pointer;
+}
+.dock img:hover{transform:scale(1.6);}
+
+/* Launchpad */
+#launchpad{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.85);
+display:none;
+flex-wrap:wrap;
+justify-content:center;
+align-content:center;
+gap:40px;
+}
+.launchIcon{
+width:100px;
+text-align:center;
+color:white;
+cursor:pointer;
+}
+
+/* Mission Control */
+#mission{
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.8);
+display:none;
+flex-wrap:wrap;
+gap:20px;
+padding:40px;
+}
+
+.dark{background:#111!important;color:white;}
+</style>
+</head>
+<body>
+
+<div id="boot"></div>
+
+<div id="login">
+<h2>Select User</h2>
+<select id="users"></select><br><br>
+<input type="password" id="pass" placeholder="Password"><br><br>
+<button onclick="login()">Login</button>
+<button onclick="createUser()">New User</button>
+<p id="err"></p>
+</div>
+
+<div id="launchpad"></div>
+<div id="mission"></div>
+
+<div class="dock" id="dock"></div>
+
+<!-- Safari -->
+<div class="window" id="safari">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('safari')"></div>
+<div class="min" onclick="minimize('safari')"></div>
+Safari
+</div>
+<div class="content">
+<input id="url" placeholder="https://example.com">
+<button onclick="go()">Go</button>
+<iframe id="browser" style="width:100%;height:300px;"></iframe>
+</div>
+</div>
+
+<!-- Finder -->
+<div class="window" id="finder">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('finder')"></div>
+<div class="min" onclick="minimize('finder')"></div>
+Finder
+</div>
+<div class="content">
+<input id="filename" placeholder="File name">
+<textarea id="filedata" placeholder="Write file..."></textarea><br>
+<button onclick="saveFile()">Save</button>
+<div id="files"></div>
+</div>
+</div>
+
+<!-- iTunes -->
+<div class="window" id="itunes">
+<div class="titlebar" onmousedown="drag(event,this.parentElement)">
+<div class="close" onclick="closeApp('itunes')"></div>
+<div class="min" onclick="minimize('itunes')"></div>
+iTunes
+</div>
+<div class="content">
+<audio controls>
+<source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+</audio>
+</div>
+</div>
+
+<script>
+/* Boot */
+setTimeout(()=>{
+document.getElementById("boot").style.display="none";
+document.getElementById("login").style.display="flex";
+loadUsers();
+},2000);
+
+/* Users */
+let users=JSON.parse(localStorage.getItem("users"))||{"User":"1234"};
+function loadUsers(){
+let sel=document.getElementById("users");
+sel.innerHTML="";
+for(let u in users){
+let opt=document.createElement("option");
+opt.textContent=u;
+sel.appendChild(opt);
+}
+}
+function login(){
+let u=document.getElementById("users").value;
+if(users[u]==document.getElementById("pass").value){
+document.getElementById("login").style.display="none";
+renderDock();
+}else document.getElementById("err").innerText="Wrong password";
+}
+function createUser(){
+let name=prompt("Username?");
+let pass=prompt("Password?");
+if(name&&pass){
+users[name]=pass;
+localStorage.setItem("users",JSON.stringify(users));
+loadUsers();
+}
+}
+
+/* Dock */
+let apps=["safari","finder","itunes"];
+function renderDock(){
+let dock=document.getElementById("dock");
+dock.innerHTML="";
+apps.forEach(app=>{
+let img=document.createElement("img");
+img.src="https://img.icons8.com/ios-filled/100/mac-os.png";
+img.onclick=()=>openApp(app);
+dock.appendChild(img);
+});
+let lp=document.createElement("img");
+lp.src="https://img.icons8.com/ios-filled/100/rocket.png";
+lp.onclick=()=>toggleLaunchpad();
+dock.appendChild(lp);
+}
+
+/* Windows */
+function openApp(id){document.getElementById(id).style.display="block";}
+function closeApp(id){document.getElementById(id).style.display="none";}
+function minimize(id){document.getElementById(id).style.transform="scale(0)";setTimeout(()=>closeApp(id),200);}
+function drag(e,el){
+let shiftX=e.clientX-el.getBoundingClientRect().left;
+let shiftY=e.clientY-el.getBoundingClientRect().top;
+function moveAt(pageX,pageY){
+el.style.left=pageX-shiftX+'px';
+el.style.top=pageY-shiftY+'px';
+}
+function onMouseMove(e){moveAt(e.pageX,e.pageY);}
+document.addEventListener('mousemove',onMouseMove);
+document.addEventListener('mouseup',()=>document.removeEventListener('mousemove',onMouseMove),{once:true});
+}
+
+/* Launchpad */
+function toggleLaunchpad(){
+let lp=document.getElementById("launchpad");
+lp.style.display=lp.style.display=="flex"?"none":"flex";
+lp.innerHTML="";
+apps.forEach(app=>{
+let div=document.createElement("div");
+div.className="launchIcon";
+div.innerHTML="<img width=60 src='https://img.icons8.com/ios-filled/100/mac-os.png'><br>"+app;
+div.onclick=()=>{openApp(app);toggleLaunchpad();}
+lp.appendChild(div);
+});
+}
+
+/* Mission Control */
+document.addEventListener("keydown",e=>{
+if(e.key=="F3"){
+let mission=document.getElementById("mission");
+mission.style.display="flex";
+mission.innerHTML="";
+document.querySelectorAll(".window").forEach(w=>{
+if(w.style.display=="block"){
+let clone=w.cloneNode(true);
+clone.style.transform="scale(.4)";
+mission.appendChild(clone);
+}
+});
+}
+});
+
+/* Finder Save */
+function saveFile(){
+let name=document.getElementById("filename").value;
+let data=document.getElementById("filedata").value;
+localStorage.setItem("file_"+name,data);
+alert("Saved!");
+}
+
+/* Safari */
+function go(){
+document.getElementById("browser").src=document.getElementById("url").value;
+}
+</script>
+
+</body>
+</html>
