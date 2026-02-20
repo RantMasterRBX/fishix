@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ultimate Arcade Game Collection</title>
+<style>
+body{
+    margin:0;
+    background:black;
+    color:#00ffcc;
+    font-family:Courier New, monospace;
+    text-align:center;
+}
+
+h1{
+    text-shadow:0 0 15px #00ffcc;
+}
+
+button{
+    background:black;
+    border:2px solid #00ffcc;
+    color:#00ffcc;
+    padding:8px 16px;
+    margin:5px;
+    cursor:pointer;
+    font-family:inherit;
+}
+
+button:hover{
+    background:#00ffcc;
+    color:black;
+}
+
+canvas{
+    display:none;
+    margin:auto;
+    border:3px solid #00ffcc;
+    box-shadow:0 0 20px #00ffcc;
+    background:#111;
+}
+
+#menu{
+    margin:20px;
+}
+
+#scoreBoard{
+    margin-top:10px;
+    font-size:14px;
+}
+</style>
+</head>
+<body>
+
+<h1>🕹 ULTIMATE ARCADE 🕹</h1>
+
+<div id="menu">
+<button onclick="startGame('snake')">Snake</button>
+<button onclick="startGame('tronAI')">Tron AI</button>
+<button onclick="startGame('tron2')">Tron 2P</button>
+<button onclick="startGame('minesMenu')">Minesweeper</button>
+<button onclick="startGame('mahjong')">Mahjong</button>
+<button onclick="startGame('slide')">Tile Slide</button>
+</div>
+
+<div id="minesControls" style="display:none;">
+<button onclick="startMines('easy')">Easy</button>
+<button onclick="startMines('medium')">Medium</button>
+<button onclick="startMines('hard')">Hard</button>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+<div id="scoreBoard"></div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+let interval;
+let currentGame;
+
+function reset(){
+    clearInterval(interval);
+    document.onkeydown=null;
+    canvas.style.display="none";
+    document.getElementById("minesControls").style.display="none";
+    document.getElementById("scoreBoard").innerHTML="";
+}
+
+function startGame(game){
+    reset();
+    currentGame=game;
+    if(game==="snake") snake();
+    if(game==="tronAI") tronAI();
+    if(game==="tron2") tron2();
+    if(game==="mahjong") simpleScreen("MAHJONG COMING SOON");
+    if(game==="slide") simpleScreen("SLIDE PUZZLE COMING SOON");
+    if(game==="minesMenu"){
+        document.getElementById("minesControls").style.display="block";
+    }
+}
+
+function simpleScreen(text){
+    canvas.width=600;
+    canvas.height=600;
+    canvas.style.display="block";
+    ctx.fillStyle="#111";
+    ctx.fillRect(0,0,600,600);
+    ctx.fillStyle="#00ffcc";
+    ctx.font="30px Courier";
+    ctx.fillText(text,80,300);
+}
+
+//////////////////////
+// SNAKE
+//////////////////////
+function snake(){
+canvas.width=600;
+canvas.height=600;
+canvas.style.display="block";
+let box=20;
+let snake=[{x:10,y:10}];
+let food={x:15,y:15};
+let dx=1,dy=0;
+
+document.onkeydown=e=>{
+if(e.key==="ArrowUp"){dx=0;dy=-1;}
+if(e.key==="ArrowDown"){dx=0;dy=1;}
+if(e.key==="ArrowLeft"){dx=-1;dy=0;}
+if(e.key==="ArrowRight"){dx=1;dy=0;}
+}
+
+interval=setInterval(()=>{
+ctx.fillStyle="#111";
+ctx.fillRect(0,0,600,600);
+
+let head={x:snake[0].x+dx,y:snake[0].y+dy};
+snake.unshift(head);
+
+if(head.x===food.x&&head.y===food.y){
+food={x:Math.floor(Math.random()*30),
+y:Math.floor(Math.random()*30)};
+}else snake.pop();
+
+ctx.fillStyle="red";
+ctx.fillRect(food.x*box,food.y*box,box,box);
+
+ctx.fillStyle="#00ffcc";
+snake.forEach(s=>ctx.fillRect(s.x*box,s.y*box,box,box));
+
+if(head.x<0||head.y<0||head.x>=30||head.y>=30){
+alert("Game Over");
+clearInterval(interval);
+}
+
+},100);
+}
+
+//////////////////////
+// TRON AI
+//////////////////////
+function tronAI(){
+canvas.width=600;
+canvas.height=600;
+canvas.style.display="block";
+let p1={x:5,y:15,dx:1,dy:0,color:"#00ffcc"};
+let ai={x:25,y:15,dx:-1,dy:0,color:"orange"};
+let grid=Array(30).fill().map(()=>Array(30).fill(0));
+
+document.onkeydown=e=>{
+if(e.key==="ArrowUp"){p1.dx=0;p1.dy=-1;}
+if(e.key==="ArrowDown"){p1.dx=0;p1.dy=1;}
+if(e.key==="ArrowLeft"){p1.dx=-1;p1.dy=0;}
+if(e.key==="ArrowRight"){p1.dx=1;p1.dy=0;}
+}
+
+interval=setInterval(()=>{
+ctx.fillStyle="#111";
+ctx.fillRect(0,0,600,600);
+move(p1); moveAI(); draw(p1); draw(ai);
+},100);
+
+function move(p){
+p.x+=p.dx; p.y+=p.dy;
+if(p.x<0||p.y<0||p.x>=30||p.y>=30||grid[p.x][p.y]){
+alert("Game Over"); clearInterval(interval);
+}
+grid[p.x][p.y]=1;
+}
+
+function moveAI(){
+let dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+let valid=dirs.filter(d=>{
+let nx=ai.x+d[0],ny=ai.y+d[1];
+return nx>=0&&ny>=0&&nx<30&&ny<30&&!grid[nx][ny];
+});
+if(valid.length){
+let c=valid[Math.floor(Math.random()*valid.length)];
+ai.dx=c[0]; ai.dy=c[1];
+}
+move(ai);
+}
+
+function draw(p){
+ctx.fillStyle=p.color;
+ctx.fillRect(p.x*20,p.y*20,20,20);
+}
+}
+
+//////////////////////
+// TRON 2 PLAYER
+//////////////////////
+function tron2(){
+canvas.width=600;
+canvas.height=600;
+canvas.style.display="block";
+let p1={x:5,y:15,dx:1,dy:0,color:"#00ffcc"};
+let p2={x:25,y:15,dx:-1,dy:0,color:"orange"};
+let grid=Array(30).fill().map(()=>Array(30).fill(0));
+
+document.onkeydown=e=>{
+if(e.key==="ArrowUp"){p1.dx=0;p1.dy=-1;}
+if(e.key==="ArrowDown"){p1.dx=0;p1.dy=1;}
+if(e.key==="ArrowLeft"){p1.dx=-1;p1.dy=0;}
+if(e.key==="ArrowRight"){p1.dx=1;p1.dy=0;}
+if(e.key==="w"){p2.dx=0;p2.dy=-1;}
+if(e.key==="s"){p2.dx=0;p2.dy=1;}
+if(e.key==="a"){p2.dx=-1;p2.dy=0;}
+if(e.key==="d"){p2.dx=1;p2.dy=0;}
+}
+
+interval=setInterval(()=>{
+ctx.fillStyle="#111";
+ctx.fillRect(0,0,600,600);
+move(p1); move(p2); draw(p1); draw(p2);
+},100);
+
+function move(p){
+p.x+=p.dx; p.y+=p.dy;
+if(p.x<0||p.y<0||p.x>=30||p.y>=30||grid[p.x][p.y]){
+alert("Game Over"); clearInterval(interval);
+}
+grid[p.x][p.y]=1;
+}
+function draw(p){
+ctx.fillStyle=p.color;
+ctx.fillRect(p.x*20,p.y*20,20,20);
+}
+}
+
+//////////////////////
+// FULL MINESWEEPER
+//////////////////////
+let grid,revealed,flagged,rows,cols,mines,cellSize=25,startTime,gameOver;
+
+function startMines(mode){
+canvas.style.display="block";
+document.getElementById("minesControls").style.display="block";
+if(mode==="easy"){rows=9;cols=9;mines=10;}
+if(mode==="medium"){rows=16;cols=16;mines=40;}
+if(mode==="hard"){rows=22;cols=22;mines=99;}
+canvas.width=cols*cellSize;
+canvas.height=rows*cellSize;
+
+grid=[]; revealed=[]; flagged=[];
+for(let r=0;r<rows;r++){
+grid[r]=[]; revealed[r]=[]; flagged[r]=[];
+for(let c=0;c<cols;c++){
+grid[r][c]=0; revealed[r][c]=false; flagged[r][c]=false;
+}
+}
+
+let placed=0;
+while(placed<mines){
+let r=Math.floor(Math.random()*rows);
+let c=Math.floor(Math.random()*cols);
+if(grid[r][c]!=="M"){grid[r][c]="M"; placed++;}
+}
+
+for(let r=0;r<rows;r++)
+for(let c=0;c<cols;c++){
+if(grid[r][c]==="M") continue;
+let count=0;
+for(let dr=-1;dr<=1;dr++)
+for(let dc=-1;dc<=1;dc++){
+let nr=r+dr,nc=c+dc;
+if(nr>=0&&nc>=0&&nr<rows&&nc<cols&&grid[nr][nc]==="M") count++;
+}
+grid[r][c]=count;
+}
+
+startTime=Date.now();
+gameOver=false;
+drawMines();
+updateScores();
+}
+
+canvas.addEventListener("click",e=>{
+if(currentGame!=="minesMenu"||gameOver) return;
+let rect=canvas.getBoundingClientRect();
+let c=Math.floor((e.clientX-rect.left)/cellSize);
+let r=Math.floor((e.clientY-rect.top)/cellSize);
+reveal(r,c);
+drawMines();
+});
+
+canvas.addEventListener("contextmenu",e=>{
+e.preventDefault();
+if(currentGame!=="minesMenu"||gameOver) return;
+let rect=canvas.getBoundingClientRect();
+let c=Math.floor((e.clientX-rect.left)/cellSize);
+let r=Math.floor((e.clientY-rect.top)/cellSize);
+flagged[r][c]=!flagged[r][c];
+drawMines();
+});
+
+function reveal(r,c){
+if(r<0||c<0||r>=rows||c>=cols||revealed[r][c]||flagged[r][c]) return;
+revealed[r][c]=true;
+if(grid[r][c]==="M"){alert("💥 Game Over"); gameOver=true; return;}
+if(grid[r][c]===0)
+for(let dr=-1;dr<=1;dr++)
+for(let dc=-1;dc<=1;dc++)
+reveal(r+dr,c+dc);
+checkWin();
+}
+
+function checkWin(){
+let safe=rows*cols-mines,count=0;
+for(let r=0;r<rows;r++)
+for(let c=0;c<cols;c++)
+if(revealed[r][c]&&grid[r][c]!=="M") count++;
+if(count===safe){
+gameOver=true;
+let time=Math.floor((Date.now()-startTime)/1000);
+saveScore(time);
+alert("🏆 You Win! "+time+"s");
+}
+}
+
+function saveScore(time){
+let mode=rows+"x"+cols;
+let best=localStorage.getItem("mines_"+mode);
+if(!best||time<best)
+localStorage.setItem("mines_"+mode,time);
+updateScores();
+}
+
+function updateScores(){
+let e=localStorage.getItem("mines_9x9")||"-";
+let m=localStorage.getItem("mines_16x16")||"-";
+let h=localStorage.getItem("mines_22x22")||"-";
+document.getElementById("scoreBoard").innerHTML=
+"HIGH SCORES<br>Easy: "+e+"s<br>Medium: "+m+"s<br>Hard: "+h+"s";
+}
+
+function drawMines(){
+ctx.fillStyle="#111";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+for(let r=0;r<rows;r++)
+for(let c=0;c<cols;c++){
+let x=c*cellSize,y=r*cellSize;
+ctx.strokeStyle="#00ffcc";
+ctx.strokeRect(x,y,cellSize,cellSize);
+if(revealed[r][c]){
+if(grid[r][c]==="M"){
+ctx.fillStyle="red";
+ctx.fillRect(x,y,cellSize,cellSize);
+}else if(grid[r][c]>0){
+ctx.fillStyle="#00ffcc";
+ctx.fillText(grid[r][c],x+8,y+18);
+}
+}else{
+ctx.fillStyle="#003333";
+ctx.fillRect(x,y,cellSize,cellSize);
+if(flagged[r][c]){
+ctx.fillStyle="yellow";
+ctx.fillText("⚑",x+6,y+18);
+}
+}
+}
+}
+</script>
+
+</body>
+</html>
