@@ -1,164 +1,122 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fishix | New Windows Style Homepage</title>
+<title>Fishix Interactive Simulators | Now With kaiju.docx</title>
+<link rel="icon" href="fishix.jpg" type="image/x-icon">       
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: "Segoe UI", sans-serif;
+body {
+    margin: 0;
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
+    background: linear-gradient(to bottom, #9ec9f5 0%, #5aa3e6 40%, #3d8edb 100%);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-body{
-  height:100vh;
-  background:url("https://images.unsplash.com/photo-1503264116251-35a269479413") center/cover no-repeat;
-  overflow:hidden;
+/* Top Glass Navigation Bar */
+.navbar {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(200,200,200,0.8));
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8),
+                0 2px 5px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Desktop */
-.desktop{
-  height:100%;
-  display:flex;
-  flex-wrap:wrap;
-  padding:40px;
-  gap:30px;
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 40px;
+    padding: 0;
+    margin: 0;
 }
 
-/* Desktop Icons */
-.icon{
-  width:90px;
-  text-align:center;
-  color:white;
-  cursor:pointer;
+.navbar li {
+    font-size: 15px;
+    color: #333;
+    cursor: pointer;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
 }
 
-.icon img{
-  width:60px;
-  height:60px;
-  border-radius:15px;
-  transition:.2s;
+/* Main Content Card */
+.card {
+    margin-top: 80px;
+    width: 600px;
+    background: linear-gradient(to bottom, #ffffff, #e6e6e6);
+    border-radius: 15px;
+    box-shadow: 
+        inset 0 2px 5px rgba(255,255,255,0.8),
+        0 8px 20px rgba(0,0,0,0.4);
+    padding: 40px;
+    text-align: center;
 }
 
-.icon:hover img{
-  transform:scale(1.1);
+.card h1 {
+    font-size: 32px;
+    color: #222;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.8);
 }
 
-/* Taskbar */
-.taskbar{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  height:60px;
-  background:rgba(255,255,255,0.15);
-  backdrop-filter: blur(20px);
-  display:flex;
-  justify-content:center;
-  align-items:center;
+.card p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 30px;
 }
 
-/* Taskbar Icons */
-.taskbar .apps{
-  display:flex;
-  gap:25px;
+/* Glossy Aqua Button */
+.aqua-button {
+    padding: 12px 30px;
+    border-radius: 25px;
+    border: 1px solid #2a6db3;
+    background: linear-gradient(to bottom, #6ec3ff 0%, #3d8edb 50%, #2a6db3 100%);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 
+        inset 0 2px 5px rgba(255,255,255,0.6),
+        0 4px 8px rgba(0,0,0,0.4);
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.3);
+    transition: all 0.1s ease-in-out;
 }
 
-.taskbar img{
-  width:35px;
-  cursor:pointer;
-  transition:.2s;
+.aqua-button:hover {
+    background: linear-gradient(to bottom, #8ed5ff 0%, #4aa0f0 50%, #327ccc 100%);
 }
 
-.taskbar img:hover{
-  transform:scale(1.2);
-}
-
-/* Start Menu */
-.start-menu{
-  position:fixed;
-  bottom:70px;
-  left:50%;
-  transform:translateX(-50%);
-  width:350px;
-  background:rgba(255,255,255,0.2);
-  backdrop-filter:blur(25px);
-  border-radius:20px;
-  padding:20px;
-  display:none;
-  color:white;
-}
-
-.start-menu h3{
-  margin-bottom:15px;
-}
-
-.tiles{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:15px;
-}
-
-.tile{
-  background:rgba(255,255,255,0.2);
-  padding:20px;
-  border-radius:15px;
-  text-align:center;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.tile:hover{
-  background:rgba(255,255,255,0.35);
+.aqua-button:active {
+    transform: translateY(2px);
+    box-shadow: 
+        inset 0 2px 5px rgba(0,0,0,0.4);
 }
 </style>
 </head>
 
 <body>
 
-<div class="desktop">
-  <div class="icon" onclick="alert('Opening My Computer')">
-    <img src="https://img.icons8.com/fluency/96/folder-invoices.png">
-    <div>My Files</div>
-  </div>
-
-  <div class="icon" onclick="alert('Opening Browser')">
-    <img src="https://img.icons8.com/color/96/internet.png">
-    <div>Browser</div>
-  </div>
-
-  <div class="icon" onclick="alert('Opening Settings')">
-    <img src="https://img.icons8.com/color/96/settings.png">
-    <div>Settings</div>
-  </div>
+<div class="navbar">
+    <ul>
+        <a href="index.html" target="_blank">Home</a></li>
+        <a href="sims.html" target="_blank">Admin Portal</li>
+    </ul>
 </div>
 
-<div class="start-menu" id="startMenu">
-  <h3>Pinned</h3>
-  <div class="tiles">
-    <a href="simulators.html">Sims</a>
-<a href="meet the devs.html">Meet The Developers</a>
-<a href="sims.html">Developer Login Portal</a>
-  </div>
+<div class="card">
+ <ul>
+     <marquee>We'r now hosting kaiju.docx as a free unblocked games resource for research purperse!</marquee>
+     <h2>Welcome to Fishix</h2>
+    <p>Your simulator home</p>
+   
+   
+ </ul>   
 </div>
-
-<div class="taskbar">
-  <div class="apps">
-    <img src="https://img.icons8.com/fluency/48/windows-11.png" onclick="toggleStart()">
-    <img src="https://img.icons8.com/color/48/microsoft-edge-new.png">
-    <img src="https://img.icons8.com/color/48/folder-invoices.png">
-    <img src="https://img.icons8.com/color/48/microsoft-store.png">
-  </div>
-</div>
-
-<script>
-function toggleStart(){
-  let menu = document.getElementById("startMenu");
-  menu.style.display = (menu.style.display === "block") ? "none" : "block";
-}
-</script>
 
 </body>
 </html>
