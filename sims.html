@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Windows</title>
+  <title>kaiju.docx</title>
 
   <style>
     body {
@@ -71,12 +71,12 @@
 
   <!-- LOGIN BOX -->
   <div class="box" id="loginBox">
-    <h2>L0g1n P0rt4l</h2>
+    <h2>kaiju.docx family</h2>
 
     <input type="text" id="usernameInput" placeholder="Username..." />
     <input type="password" id="passwordInput" placeholder="Password..." />
 
-    <button onclick="login()">L0g1n</button>
+    <button onclick="login()">verify your cool</button>
     <p id="errorMsg" style="color:red; margin-top:10px;"></p>
   </div>
 
@@ -127,7 +127,7 @@
     const users = [
       { username: "kaiju", password: "Frank The Snake", role: "admin" },
       { username: "The Game Of Life", password: "MONOPOLY Fortnite", role: "admin" },
-      { username: "kayden", password: "Yuji", role: "friend" }
+      { username: "Mathew Chapman", password: "This Password Is Incredibly Simple", role: "kaiju" }
     ];
 
     function login() {
@@ -142,12 +142,12 @@
 
         if (foundUser.role === "admin") {
           document.getElementById("adminContent").style.display = "block";
-        } else if (foundUser.role === "friend") {
+        } else if (foundUser.role === "kaiju") {
           document.getElementById("friendContent").style.display = "block";
         }
 
       } else {
-        errorMsg.textContent = "Please fill out the form and wait for the username and password to come to you!";
+        errorMsg.textContent = "Uh-oh! Appears your too lame and an i-pad kid to login! Please change then come back!";
       }
     }
 
